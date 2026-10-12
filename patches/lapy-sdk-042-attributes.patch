@@ -1,0 +1,30 @@
+Changes to source/owned_root_daemon.c of mpereiraesaa/PS5-Lapy-JB-Daemon
+(revision 54a095c0f19161825e845daa760a03b446e654fa) for the 32 attribute bytes of
+payload SDK v0.42. That file is Copyright (c) 2026 Arksama (Team PHU), MIT License:
+https://github.com/mpereiraesaa/PS5-Lapy-JB-Daemon/blob/54a095c0f19161825e845daa760a03b446e654fa/LICENSE
+
+--- a/source/owned_root_daemon.c
++++ b/source/owned_root_daemon.c
+@@ -79,3 +79,4 @@
+     uint32_t ngroups;
+-    uint64_t authid, attrs;
++    uint64_t authid;
++    uint8_t attrs[32];
+     uint8_t caps[16];
+@@ -491,4 +492,4 @@
+     out->authid = kernel_get_ucred_authid(pid);
+-    out->attrs = kernel_get_ucred_attrs(pid);
+-    return kernel_get_ucred_caps(pid, out->caps) ||
++    return kernel_get_ucred_attrs(pid, out->attrs) ||
++           kernel_get_ucred_caps(pid, out->caps) ||
+            kernel_copyout(ucred + UCRED_NGROUPS, &out->ngroups,
+@@ -509,3 +510,3 @@
+            found.authid == expected->authid &&
+-           found.attrs == expected->attrs &&
++           !memcmp(found.attrs, expected->attrs, sizeof(found.attrs)) &&
+            !memcmp(found.caps, expected->caps, sizeof(found.caps));
+@@ -665,3 +666,3 @@
+     memset(elevated.caps, 0xff, sizeof(elevated.caps));
+-    elevated.attrs |= UINT64_C(0x80);
++    elevated.attrs[0] |= UINT8_C(0x80);
+     cred_changed = 1;
